@@ -1,6 +1,11 @@
 *
 !.gitignore
-!README.md
+!.agent/
+CODING.md
+IDEAS.md
+BUSINESS_MODEL.md
+MVP.md
+STRATEGIES.md
 !datalint/
 !tests/
 !pyproject.toml
