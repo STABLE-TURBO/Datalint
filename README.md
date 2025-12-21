@@ -152,8 +152,39 @@ datalint/
 │   └── profiler.py     # Statistical profiling
 └── utils/
     ├── io.py           # File loading (CSV, Excel, Parquet)
-    └── reporting.py    # Output formatters (text, JSON, HTML)
+    └── reporting.py    # Output formatter (text, JSON, HTML)
 ```
+
+### Class Diagram
+
+<!-- DIAGRAM-START -->
+```mermaid
+classDiagram
+  class BaseValidator {
+    name : str
+    validate(df: pd.DataFrame)* ValidationResult
+  }
+  class Formatter {
+    format(results: list[ValidationResult])* str
+  }
+  class ValidationResult {
+    details : dict
+    issues : list
+    message : str
+    name : str
+    passed : bool
+    recommendations : list
+    status : Literal['passed', 'warning', 'failed']
+    to_dict() dict
+  }
+  class ValidationRunner {
+    validators : list
+    add_validator(validator: BaseValidator) None
+    run(df: pd.DataFrame) list[ValidationResult]
+    run_dict(df: pd.DataFrame) dict[str, ValidationResult]
+  }
+```
+<!-- DIAGRAM-END -->
 
 ---
 
