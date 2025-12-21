@@ -1,4 +1,7 @@
-BUSINESS_MODEL.md
-CODING.md
-MVP.md
-STRATEGIES.md
+*
+!.gitignore
+!README.md
+!datalint/
+!tests/
+!pyproject.toml
+!book/
