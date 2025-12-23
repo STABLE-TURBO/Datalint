@@ -97,6 +97,7 @@ class DiagramGenerator:
         self.generate_class_diagram()
         self.generate_component_diagram()
         self.generate_deployment_diagram()
+        self.generate_interface_diagram()
 
         # Behavioral Diagrams
         self.generate_sequence_diagram()
@@ -146,6 +147,46 @@ class DiagramGenerator:
         mermaid_content += "    Python --> DataLint\n"
 
         self._generate_mermaid("deployment_diagram", mermaid_content)
+
+    def generate_interface_diagram(self):
+        """Generate interface diagram showing key interfaces and abstractions"""
+        mermaid_content = "classDiagram\n"
+        mermaid_content += "    class BaseValidator {\n"
+        mermaid_content += "        <<abstract>>\n"
+        mermaid_content += "        +name: str*\n"
+        mermaid_content += "        +validate(df: DataFrame): ValidationResult*\n"
+        mermaid_content += "    }\n\n"
+
+        mermaid_content += "    class Formatter {\n"
+        mermaid_content += "        <<abstract>>\n"
+        mermaid_content += "        +format(results: List[ValidationResult]): str*\n"
+        mermaid_content += "    }\n\n"
+
+        mermaid_content += "    class ValidationResult {\n"
+        mermaid_content += "        +name: str\n"
+        mermaid_content += "        +status: Literal['passed', 'warning', 'failed']\n"
+        mermaid_content += "        +message: str\n"
+        mermaid_content += "        +issues: List\n"
+        mermaid_content += "        +recommendations: List\n"
+        mermaid_content += "        +details: Dict\n"
+        mermaid_content += "        +passed: bool\n"
+        mermaid_content += "        +to_dict(): Dict\n"
+        mermaid_content += "    }\n\n"
+
+        mermaid_content += "    class ValidationRunner {\n"
+        mermaid_content += "        -validators: List[BaseValidator]\n"
+        mermaid_content += "        +__init__(validators=None)\n"
+        mermaid_content += "        +add_validator(validator: BaseValidator)\n"
+        mermaid_content += "        +run(df: DataFrame): List[ValidationResult]\n"
+        mermaid_content += "        +run_dict(df: DataFrame): Dict[str, ValidationResult]\n"
+        mermaid_content += "    }\n\n"
+
+        mermaid_content += "    BaseValidator <|.. ConcreteValidator : implements\n"
+        mermaid_content += "    Formatter <|.. ConcreteFormatter : implements\n"
+        mermaid_content += "    ValidationRunner --> BaseValidator : uses\n"
+        mermaid_content += "    BaseValidator --> ValidationResult : returns\n"
+
+        self._generate_mermaid("interface_diagram", mermaid_content)
 
     def generate_sequence_diagram(self):
         """Generate sequence diagram for validation workflow"""
@@ -280,6 +321,7 @@ class ReadmeUpdater:
         """Generate the diagrams section for README"""
         diagrams = [
             ("Class Diagram", "classes_datalint.png", "Shows the class hierarchy and relationships (generated via pyreverse)"),
+            ("Interface Diagram", "interface_diagram.mmd", "Shows key interfaces and abstraction contracts"),
             ("Component Diagram", "component_diagram.mmd", "Illustrates high-level software components"),
             ("Deployment Diagram", "deployment_diagram.mmd", "Shows how the system is deployed"),
             ("Sequence Diagram", "sequence_diagram.mmd", "Displays the validation workflow sequence"),
