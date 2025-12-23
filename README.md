@@ -160,44 +160,34 @@ datalint/
 #### Component Diagram
 *Illustrates high-level software components*
 
-```plantuml
-@startuml Component Diagram
-skinparam componentStyle uml2
+```mermaid
+graph TD
+    CLI[Command Line Interface]<br/>cli.py]
+    ENG[Core Validation Engine<br/>engine/]
+    UTI[Utility Functions<br/>utils/]
 
-[cli] as cli <<Command Line Interface>>
-[engine] as engine <<Core Validation Engine>>
-[utils] as utils <<Utility Functions>>
+    CLI --> ENG
+    CLI --> UTI
+    ENG --> UTI
 
-cli --> engine
-cli --> utils
-engine --> utils
-engine --> utils
-engine --> utils
-engine --> utils
-
-@enduml
 ```
 
 #### Deployment Diagram
 *Shows how the system is deployed*
 
-```plantuml
-@startuml Deployment Diagram
-skinparam componentStyle uml2
+```mermaid
+graph TD
+    subgraph Local[Local Machine]
+        Python[Python Environment]
+        DataLint[DataLint Package]
+    end
+    Data[Data Files]
+    Reports[Output Reports]
 
-node "Local Machine" as local {
-  [Python Environment] as python
-  [DataLint Package] as datalint
-}
+    DataLint --> Data
+    DataLint --> Reports
+    Python --> DataLint
 
-node "Data Files" as data
-node "Output Reports" as reports
-
-datalint --> data : reads
-datalint --> reports : writes
-python --> datalint : executes
-
-@enduml
 ```
 
 #### Sequence Diagram

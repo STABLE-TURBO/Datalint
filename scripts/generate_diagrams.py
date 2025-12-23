@@ -122,52 +122,30 @@ class DiagramGenerator:
 
     def generate_component_diagram(self):
         """Generate component diagram showing module relationships"""
-        plantuml_content = "@startuml Component Diagram\n"
-        plantuml_content += "skinparam componentStyle uml2\n\n"
+        mermaid_content = "graph TD\n"
+        mermaid_content += "    CLI[Command Line Interface]<br/>cli.py]\n"
+        mermaid_content += "    ENG[Core Validation Engine<br/>engine/]\n"
+        mermaid_content += "    UTI[Utility Functions<br/>utils/]\n\n"
+        mermaid_content += "    CLI --> ENG\n"
+        mermaid_content += "    CLI --> UTI\n"
+        mermaid_content += "    ENG --> UTI\n"
 
-        # Define components
-        components = {
-            "cli": "Command Line Interface",
-            "engine": "Core Validation Engine",
-            "utils": "Utility Functions"
-        }
-
-        for comp, desc in components.items():
-            plantuml_content += f'[{comp}] as {comp} <<{desc}>>\n'
-
-        # Add relationships based on imports
-        plantuml_content += "\n"
-        for module, imports in self.analyzer.imports.items():
-            if "cli" in module:
-                plantuml_content += "cli --> engine\n"
-                plantuml_content += "cli --> utils\n"
-            elif "engine" in module:
-                plantuml_content += "engine --> utils\n"
-
-        plantuml_content += "\n@enduml"
-
-        self._generate_plantuml("component_diagram", plantuml_content)
+        self._generate_mermaid("component_diagram", mermaid_content)
 
     def generate_deployment_diagram(self):
         """Generate deployment diagram"""
-        plantuml_content = "@startuml Deployment Diagram\n"
-        plantuml_content += "skinparam componentStyle uml2\n\n"
+        mermaid_content = "graph TD\n"
+        mermaid_content += "    subgraph Local[Local Machine]\n"
+        mermaid_content += "        Python[Python Environment]\n"
+        mermaid_content += "        DataLint[DataLint Package]\n"
+        mermaid_content += "    end\n"
+        mermaid_content += "    Data[Data Files]\n"
+        mermaid_content += "    Reports[Output Reports]\n\n"
+        mermaid_content += "    DataLint --> Data\n"
+        mermaid_content += "    DataLint --> Reports\n"
+        mermaid_content += "    Python --> DataLint\n"
 
-        plantuml_content += 'node "Local Machine" as local {\n'
-        plantuml_content += '  [Python Environment] as python\n'
-        plantuml_content += '  [DataLint Package] as datalint\n'
-        plantuml_content += '}\n\n'
-
-        plantuml_content += 'node "Data Files" as data\n'
-        plantuml_content += 'node "Output Reports" as reports\n\n'
-
-        plantuml_content += "datalint --> data : reads\n"
-        plantuml_content += "datalint --> reports : writes\n"
-        plantuml_content += "python --> datalint : executes\n"
-
-        plantuml_content += "\n@enduml"
-
-        self._generate_plantuml("deployment_diagram", plantuml_content)
+        self._generate_mermaid("deployment_diagram", mermaid_content)
 
     def generate_sequence_diagram(self):
         """Generate sequence diagram for validation workflow"""
@@ -253,8 +231,18 @@ class DiagramGenerator:
 
         self._generate_plantuml("use_case_diagram", plantuml_content)
 
+    def _generate_mermaid(self, name: str, content: str):
+        """Generate Mermaid diagram file"""
+        mermaid_file = self.diagrams_dir / f"{name}.mmd"
+
+        # Write Mermaid file
+        with open(mermaid_file, 'w', encoding='utf-8') as f:
+            f.write(content)
+
+        print(f"Generated Mermaid file: {mermaid_file}")
+
     def _generate_plantuml(self, name: str, content: str):
-        """Generate PlantUML file (PNG generation requires external tools)"""
+        """Generate PlantUML file"""
         plantuml_file = self.diagrams_dir / f"{name}.puml"
 
         # Write PlantUML file
@@ -262,9 +250,6 @@ class DiagramGenerator:
             f.write(content)
 
         print(f"Generated PlantUML file: {plantuml_file}")
-
-        # Note: PNG generation requires external PlantUML installation
-        # For now, we'll keep the .puml files which can be rendered online
 
 
 class ReadmeUpdater:
@@ -300,8 +285,8 @@ class ReadmeUpdater:
         """Generate the diagrams section for README"""
         diagrams = [
             ("Class Diagram", "classes_datalint.png", "Shows the class hierarchy and relationships (generated via pyreverse)"),
-            ("Component Diagram", "component_diagram.puml", "Illustrates high-level software components"),
-            ("Deployment Diagram", "deployment_diagram.puml", "Shows how the system is deployed"),
+            ("Component Diagram", "component_diagram.mmd", "Illustrates high-level software components"),
+            ("Deployment Diagram", "deployment_diagram.mmd", "Shows how the system is deployed"),
             ("Sequence Diagram", "sequence_diagram.puml", "Displays the validation workflow sequence"),
             ("Activity Diagram", "activity_diagram.puml", "Shows the validation pipeline activities"),
             ("Use Case Diagram", "use_case_diagram.puml", "Illustrates user interactions with the system")
@@ -314,7 +299,13 @@ class ReadmeUpdater:
             if diagram_path.exists():
                 section += f"#### {title}\n"
                 section += f"*{description}*\n\n"
-                if filename.endswith('.puml'):
+                if filename.endswith('.mmd'):
+                    # GitHub renders Mermaid natively
+                    section += f"```mermaid\n"
+                    with open(diagram_path, 'r', encoding='utf-8') as f:
+                        section += f.read()
+                    section += "\n```\n\n"
+                elif filename.endswith('.puml'):
                     # GitHub can render PlantUML files directly
                     section += f"```plantuml\n"
                     with open(diagram_path, 'r', encoding='utf-8') as f:

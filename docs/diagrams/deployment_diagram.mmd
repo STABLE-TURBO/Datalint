@@ -1,0 +1,11 @@
+graph TD
+    subgraph Local[Local Machine]
+        Python[Python Environment]
+        DataLint[DataLint Package]
+    end
+    Data[Data Files]
+    Reports[Output Reports]
+
+    DataLint --> Data
+    DataLint --> Reports
+    Python --> DataLint
