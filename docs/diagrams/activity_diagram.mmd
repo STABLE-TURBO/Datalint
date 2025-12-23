@@ -1,0 +1,29 @@
+flowchart TD
+    Start([Start])
+    Run[User runs datalint validate]
+    Parse[Parse command line arguments]
+    Load[Load data file]
+    Check{File loaded successfully?}
+    Init[Initialize ValidationRunner]
+    Validate[Run all validators]
+    CheckResult{Validation passed?}
+    Success[Generate success report]
+    Fail[Generate failure report]
+    Recomm[Show recommendations]
+    Error[Show error message]
+    Exit([Exit])
+
+    Start --> Run
+    Run --> Parse
+    Parse --> Load
+    Load --> Check
+    Check -->|Yes| Init
+    Init --> Validate
+    Validate --> CheckResult
+    CheckResult -->|Yes| Success
+    CheckResult -->|No| Fail
+    Fail --> Recomm
+    Success --> Exit
+    Recomm --> Exit
+    Check -->|No| Error
+    Error --> Exit

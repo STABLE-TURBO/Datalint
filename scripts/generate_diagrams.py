@@ -149,87 +149,82 @@ class DiagramGenerator:
 
     def generate_sequence_diagram(self):
         """Generate sequence diagram for validation workflow"""
-        plantuml_content = "@startuml Sequence Diagram\n"
-        plantuml_content += "autonumber\n\n"
+        mermaid_content = "sequenceDiagram\n"
+        mermaid_content += "    participant U as User\n"
+        mermaid_content += "    participant C as CLI\n"
+        mermaid_content += "    participant V as ValidationRunner\n"
+        mermaid_content += "    participant B as BaseValidator\n"
+        mermaid_content += "    participant D as DataFrame\n\n"
 
-        plantuml_content += "actor User\n"
-        plantuml_content += "participant CLI\n"
-        plantuml_content += "participant ValidationRunner\n"
-        plantuml_content += "participant BaseValidator\n"
-        plantuml_content += "participant DataFrame\n\n"
+        mermaid_content += "    U->>C: datalint validate file.csv\n"
+        mermaid_content += "    C->>V: run(df)\n"
+        mermaid_content += "    loop for each validator\n"
+        mermaid_content += "        V->>B: validate(df)\n"
+        mermaid_content += "        B->>D: analyze data\n"
+        mermaid_content += "        D-->>B: return analysis\n"
+        mermaid_content += "        B-->>V: ValidationResult\n"
+        mermaid_content += "    end\n"
+        mermaid_content += "    V-->>C: results list\n"
+        mermaid_content += "    C-->>U: formatted output\n"
 
-        plantuml_content += "User -> CLI: datalint validate file.csv\n"
-        plantuml_content += "CLI -> ValidationRunner: run(df)\n"
-        plantuml_content += "loop for each validator\n"
-        plantuml_content += "  ValidationRunner -> BaseValidator: validate(df)\n"
-        plantuml_content += "  BaseValidator -> DataFrame: analyze data\n"
-        plantuml_content += "  DataFrame --> BaseValidator: return analysis\n"
-        plantuml_content += "  BaseValidator --> ValidationRunner: ValidationResult\n"
-        plantuml_content += "end\n"
-        plantuml_content += "ValidationRunner --> CLI: results list\n"
-        plantuml_content += "CLI --> User: formatted output\n"
-
-        plantuml_content += "\n@enduml"
-
-        self._generate_plantuml("sequence_diagram", plantuml_content)
+        self._generate_mermaid("sequence_diagram", mermaid_content)
 
     def generate_activity_diagram(self):
         """Generate activity diagram for validation pipeline"""
-        plantuml_content = "@startuml Activity Diagram\n"
-        plantuml_content += "start\n"
+        mermaid_content = "flowchart TD\n"
+        mermaid_content += "    Start([Start])\n"
+        mermaid_content += "    Run[User runs datalint validate]\n"
+        mermaid_content += "    Parse[Parse command line arguments]\n"
+        mermaid_content += "    Load[Load data file]\n"
+        mermaid_content += "    Check{File loaded successfully?}\n"
+        mermaid_content += "    Init[Initialize ValidationRunner]\n"
+        mermaid_content += "    Validate[Run all validators]\n"
+        mermaid_content += "    CheckResult{Validation passed?}\n"
+        mermaid_content += "    Success[Generate success report]\n"
+        mermaid_content += "    Fail[Generate failure report]\n"
+        mermaid_content += "    Recomm[Show recommendations]\n"
+        mermaid_content += "    Error[Show error message]\n"
+        mermaid_content += "    Exit([Exit])\n\n"
 
-        plantuml_content += ":User runs datalint validate;\n"
-        plantuml_content += ":Parse command line arguments;\n"
-        plantuml_content += ":Load data file;\n"
+        mermaid_content += "    Start --> Run\n"
+        mermaid_content += "    Run --> Parse\n"
+        mermaid_content += "    Parse --> Load\n"
+        mermaid_content += "    Load --> Check\n"
+        mermaid_content += "    Check -->|Yes| Init\n"
+        mermaid_content += "    Init --> Validate\n"
+        mermaid_content += "    Validate --> CheckResult\n"
+        mermaid_content += "    CheckResult -->|Yes| Success\n"
+        mermaid_content += "    CheckResult -->|No| Fail\n"
+        mermaid_content += "    Fail --> Recomm\n"
+        mermaid_content += "    Success --> Exit\n"
+        mermaid_content += "    Recomm --> Exit\n"
+        mermaid_content += "    Check -->|No| Error\n"
+        mermaid_content += "    Error --> Exit\n"
 
-        plantuml_content += "if (File loaded successfully?) then (yes)\n"
-        plantuml_content += "  :Initialize ValidationRunner;\n"
-        plantuml_content += "  :Run all validators;\n"
-
-        plantuml_content += "  if (Validation passed?) then (yes)\n"
-        plantuml_content += "    :Generate success report;\n"
-        plantuml_content += "  else (no)\n"
-        plantuml_content += "    :Generate failure report;\n"
-        plantuml_content += "    :Show recommendations;\n"
-        plantuml_content += "  endif\n"
-
-        plantuml_content += "else (no)\n"
-        plantuml_content += "  :Show error message;\n"
-        plantuml_content += "endif\n"
-
-        plantuml_content += ":Exit;\n"
-        plantuml_content += "stop\n"
-
-        plantuml_content += "\n@enduml"
-
-        self._generate_plantuml("activity_diagram", plantuml_content)
+        self._generate_mermaid("activity_diagram", mermaid_content)
 
     def generate_use_case_diagram(self):
         """Generate use case diagram"""
-        plantuml_content = "@startuml Use Case Diagram\n"
-        plantuml_content += "left to right direction\n\n"
+        mermaid_content = "flowchart LR\n"
+        mermaid_content += "    DS([Data Scientist])\n"
+        mermaid_content += "    MLE([ML Engineer])\n"
+        mermaid_content += "    DevOps([DevOps Engineer])\n\n"
 
-        plantuml_content += "actor :Data Scientist: as DS\n"
-        plantuml_content += "actor :ML Engineer: as MLE\n"
-        plantuml_content += "actor :DevOps Engineer: as DevOps\n\n"
+        mermaid_content += "    UC1[Validate Dataset]\n"
+        mermaid_content += "    UC2[Learn from Clean Data]\n"
+        mermaid_content += "    UC3[Profile Data Quality]\n"
+        mermaid_content += "    UC4[Generate Reports]\n"
+        mermaid_content += "    UC5[CI/CD Integration]\n\n"
 
-        plantuml_content += 'usecase "Validate Dataset" as UC1\n'
-        plantuml_content += 'usecase "Learn from Clean Data" as UC2\n'
-        plantuml_content += 'usecase "Profile Data Quality" as UC3\n'
-        plantuml_content += 'usecase "Generate Reports" as UC4\n'
-        plantuml_content += 'usecase "CI/CD Integration" as UC5\n\n'
+        mermaid_content += "    DS --> UC1\n"
+        mermaid_content += "    DS --> UC2\n"
+        mermaid_content += "    MLE --> UC3\n"
+        mermaid_content += "    DevOps --> UC5\n"
+        mermaid_content += "    UC1 --> UC4\n"
+        mermaid_content += "    UC2 --> UC4\n"
+        mermaid_content += "    UC3 --> UC4\n"
 
-        plantuml_content += "DS --> UC1\n"
-        plantuml_content += "DS --> UC2\n"
-        plantuml_content += "MLE --> UC3\n"
-        plantuml_content += "DevOps --> UC5\n"
-        plantuml_content += "UC1 --> UC4\n"
-        plantuml_content += "UC2 --> UC4\n"
-        plantuml_content += "UC3 --> UC4\n"
-
-        plantuml_content += "\n@enduml"
-
-        self._generate_plantuml("use_case_diagram", plantuml_content)
+        self._generate_mermaid("use_case_diagram", mermaid_content)
 
     def _generate_mermaid(self, name: str, content: str):
         """Generate Mermaid diagram file"""
@@ -287,9 +282,9 @@ class ReadmeUpdater:
             ("Class Diagram", "classes_datalint.png", "Shows the class hierarchy and relationships (generated via pyreverse)"),
             ("Component Diagram", "component_diagram.mmd", "Illustrates high-level software components"),
             ("Deployment Diagram", "deployment_diagram.mmd", "Shows how the system is deployed"),
-            ("Sequence Diagram", "sequence_diagram.puml", "Displays the validation workflow sequence"),
-            ("Activity Diagram", "activity_diagram.puml", "Shows the validation pipeline activities"),
-            ("Use Case Diagram", "use_case_diagram.puml", "Illustrates user interactions with the system")
+            ("Sequence Diagram", "sequence_diagram.mmd", "Displays the validation workflow sequence"),
+            ("Activity Diagram", "activity_diagram.mmd", "Shows the validation pipeline activities"),
+            ("Use Case Diagram", "use_case_diagram.mmd", "Illustrates user interactions with the system")
         ]
 
         section = ""

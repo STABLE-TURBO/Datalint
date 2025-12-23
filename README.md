@@ -193,83 +193,86 @@ graph TD
 #### Sequence Diagram
 *Displays the validation workflow sequence*
 
-```plantuml
-@startuml Sequence Diagram
-autonumber
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant C as CLI
+    participant V as ValidationRunner
+    participant B as BaseValidator
+    participant D as DataFrame
 
-actor User
-participant CLI
-participant ValidationRunner
-participant BaseValidator
-participant DataFrame
+    U->>C: datalint validate file.csv
+    C->>V: run(df)
+    loop for each validator
+        V->>B: validate(df)
+        B->>D: analyze data
+        D-->>B: return analysis
+        B-->>V: ValidationResult
+    end
+    V-->>C: results list
+    C-->>U: formatted output
 
-User -> CLI: datalint validate file.csv
-CLI -> ValidationRunner: run(df)
-loop for each validator
-  ValidationRunner -> BaseValidator: validate(df)
-  BaseValidator -> DataFrame: analyze data
-  DataFrame --> BaseValidator: return analysis
-  BaseValidator --> ValidationRunner: ValidationResult
-end
-ValidationRunner --> CLI: results list
-CLI --> User: formatted output
-
-@enduml
 ```
 
 #### Activity Diagram
 *Shows the validation pipeline activities*
 
-```plantuml
-@startuml Activity Diagram
-start
-:User runs datalint validate;
-:Parse command line arguments;
-:Load data file;
-if (File loaded successfully?) then (yes)
-  :Initialize ValidationRunner;
-  :Run all validators;
-  if (Validation passed?) then (yes)
-    :Generate success report;
-  else (no)
-    :Generate failure report;
-    :Show recommendations;
-  endif
-else (no)
-  :Show error message;
-endif
-:Exit;
-stop
+```mermaid
+flowchart TD
+    Start([Start])
+    Run[User runs datalint validate]
+    Parse[Parse command line arguments]
+    Load[Load data file]
+    Check{File loaded successfully?}
+    Init[Initialize ValidationRunner]
+    Validate[Run all validators]
+    CheckResult{Validation passed?}
+    Success[Generate success report]
+    Fail[Generate failure report]
+    Recomm[Show recommendations]
+    Error[Show error message]
+    Exit([Exit])
 
-@enduml
+    Start --> Run
+    Run --> Parse
+    Parse --> Load
+    Load --> Check
+    Check -->|Yes| Init
+    Init --> Validate
+    Validate --> CheckResult
+    CheckResult -->|Yes| Success
+    CheckResult -->|No| Fail
+    Fail --> Recomm
+    Success --> Exit
+    Recomm --> Exit
+    Check -->|No| Error
+    Error --> Exit
+
 ```
 
 #### Use Case Diagram
 *Illustrates user interactions with the system*
 
-```plantuml
-@startuml Use Case Diagram
-left to right direction
+```mermaid
+flowchart LR
+    DS([Data Scientist])
+    MLE([ML Engineer])
+    DevOps([DevOps Engineer])
 
-actor :Data Scientist: as DS
-actor :ML Engineer: as MLE
-actor :DevOps Engineer: as DevOps
+    UC1[Validate Dataset]
+    UC2[Learn from Clean Data]
+    UC3[Profile Data Quality]
+    UC4[Generate Reports]
+    UC5[CI/CD Integration]
 
-usecase "Validate Dataset" as UC1
-usecase "Learn from Clean Data" as UC2
-usecase "Profile Data Quality" as UC3
-usecase "Generate Reports" as UC4
-usecase "CI/CD Integration" as UC5
+    DS --> UC1
+    DS --> UC2
+    MLE --> UC3
+    DevOps --> UC5
+    UC1 --> UC4
+    UC2 --> UC4
+    UC3 --> UC4
 
-DS --> UC1
-DS --> UC2
-MLE --> UC3
-DevOps --> UC5
-UC1 --> UC4
-UC2 --> UC4
-UC3 --> UC4
-
-@enduml
 ```
 
 

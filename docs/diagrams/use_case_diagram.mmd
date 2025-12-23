@@ -1,0 +1,18 @@
+flowchart LR
+    DS([Data Scientist])
+    MLE([ML Engineer])
+    DevOps([DevOps Engineer])
+
+    UC1[Validate Dataset]
+    UC2[Learn from Clean Data]
+    UC3[Profile Data Quality]
+    UC4[Generate Reports]
+    UC5[CI/CD Integration]
+
+    DS --> UC1
+    DS --> UC2
+    MLE --> UC3
+    DevOps --> UC5
+    UC1 --> UC4
+    UC2 --> UC4
+    UC3 --> UC4

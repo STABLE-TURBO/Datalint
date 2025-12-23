@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant U as User
+    participant C as CLI
+    participant V as ValidationRunner
+    participant B as BaseValidator
+    participant D as DataFrame
+
+    U->>C: datalint validate file.csv
+    C->>V: run(df)
+    loop for each validator
+        V->>B: validate(df)
+        B->>D: analyze data
+        D-->>B: return analysis
+        B-->>V: ValidationResult
+    end
+    V-->>C: results list
+    C-->>U: formatted output
