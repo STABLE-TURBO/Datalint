@@ -123,9 +123,9 @@ class DiagramGenerator:
     def generate_component_diagram(self):
         """Generate component diagram showing module relationships"""
         mermaid_content = "graph TD\n"
-        mermaid_content += "    CLI[Command Line Interface]<br/>cli.py]\n"
-        mermaid_content += "    ENG[Core Validation Engine<br/>engine/]\n"
-        mermaid_content += "    UTI[Utility Functions<br/>utils/]\n\n"
+        mermaid_content += "    CLI[Command Line Interface]\n"
+        mermaid_content += "    ENG[Core Validation Engine] \n"
+        mermaid_content += "    UTI[Utility Functions]\n\n"
         mermaid_content += "    CLI --> ENG\n"
         mermaid_content += "    CLI --> UTI\n"
         mermaid_content += "    ENG --> UTI\n"

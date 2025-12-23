@@ -162,9 +162,9 @@ datalint/
 
 ```mermaid
 graph TD
-    CLI[Command Line Interface]<br/>cli.py]
-    ENG[Core Validation Engine<br/>engine/]
-    UTI[Utility Functions<br/>utils/]
+    CLI[Command Line Interface]
+    ENG[Core Validation Engine] 
+    UTI[Utility Functions]
 
     CLI --> ENG
     CLI --> UTI
