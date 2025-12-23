@@ -3,6 +3,8 @@ from dataclasses import dataclass, field
 from typing import Any, Literal
 import pandas as pd
 
+
+# Contracts: ValidationResult --> Defines the standardized result format.
 @dataclass
 class ValidationResult:
     """
@@ -43,7 +45,7 @@ class ValidationResult:
             'details': self.details
         }
 
-
+# Interfaces: BaseValidator, Formatter, ValidationRunner
 class BaseValidator(ABC):
     """
     Abstract base class for all validators.
