@@ -105,21 +105,57 @@ class DiagramGenerator:
         self.generate_use_case_diagram()
 
     def generate_class_diagram(self):
-        """Generate class diagram using pyreverse"""
-        try:
-            cmd = [
-                "pyreverse",
-                "-o", "png",
-                "-p", "datalint",
-                "datalint"
-            ]
-            subprocess.run(cmd, check=True, cwd=".")
-            # Move generated files to diagrams directory
-            for file in Path(".").glob("*.png"):
-                if "classes" in file.name or "packages" in file.name:
-                    file.rename(self.diagrams_dir / file.name)
-        except subprocess.CalledProcessError as e:
-            print(f"Error generating class diagram: {e}")
+        """Generate class diagram showing class hierarchy and relationships"""
+        mermaid_content = "classDiagram\n"
+        mermaid_content += "    class BaseValidator {\n"
+        mermaid_content += "        <<abstract>>\n"
+        mermaid_content += "        +String name*\n"
+        mermaid_content += "        +ValidationResult validate(DataFrame df)*\n"
+        mermaid_content += "        +String __repr__()\n"
+        mermaid_content += "    }\n\n"
+
+        mermaid_content += "    class Formatter {\n"
+        mermaid_content += "        <<abstract>>\n"
+        mermaid_content += "        +String format(List~ValidationResult~ results)*\n"
+        mermaid_content += "    }\n\n"
+
+        mermaid_content += "    class ValidationResult {\n"
+        mermaid_content += "        +String name\n"
+        mermaid_content += "        +String status\n"
+        mermaid_content += "        +String message\n"
+        mermaid_content += "        +List issues\n"
+        mermaid_content += "        +List recommendations\n"
+        mermaid_content += "        +Dict details\n"
+        mermaid_content += "        +Boolean passed\n"
+        mermaid_content += "        +Dict to_dict()\n"
+        mermaid_content += "    }\n\n"
+
+        mermaid_content += "    class ValidationRunner {\n"
+        mermaid_content += "        -List~BaseValidator~ validators\n"
+        mermaid_content += "        +ValidationRunner(List~BaseValidator~ validators)\n"
+        mermaid_content += "        +void add_validator(BaseValidator validator)\n"
+        mermaid_content += "        +List~ValidationResult~ run(DataFrame df)\n"
+        mermaid_content += "        +Dict~String,ValidationResult~ run_dict(DataFrame df)\n"
+        mermaid_content += "    }\n\n"
+
+        # Concrete implementations (simplified)
+        mermaid_content += "    class ConcreteValidator {\n"
+        mermaid_content += "        +String name\n"
+        mermaid_content += "        +ValidationResult validate(DataFrame df)\n"
+        mermaid_content += "    }\n\n"
+
+        mermaid_content += "    class ConcreteFormatter {\n"
+        mermaid_content += "        +String format(List~ValidationResult~ results)\n"
+        mermaid_content += "    }\n\n"
+
+        # Relationships
+        mermaid_content += "    BaseValidator <|.. ConcreteValidator : implements\n"
+        mermaid_content += "    Formatter <|.. ConcreteFormatter : implements\n"
+        mermaid_content += "    ValidationRunner --> BaseValidator : uses\n"
+        mermaid_content += "    BaseValidator --> ValidationResult : returns\n"
+        mermaid_content += "    ConcreteValidator --> ValidationResult : returns\n"
+
+        self._generate_mermaid("class_diagram", mermaid_content)
 
     def generate_component_diagram(self):
         """Generate component diagram showing module relationships"""
@@ -320,7 +356,7 @@ class ReadmeUpdater:
     def _generate_diagrams_section(self):
         """Generate the diagrams section for README"""
         diagrams = [
-            ("Class Diagram", "classes_datalint.png", "Shows the class hierarchy and relationships (generated via pyreverse)"),
+            ("Class Diagram", "class_diagram.mmd", "Shows the class hierarchy and relationships"),
             ("Interface Diagram", "interface_diagram.mmd", "Shows key interfaces and abstraction contracts"),
             ("Component Diagram", "component_diagram.mmd", "Illustrates high-level software components"),
             ("Deployment Diagram", "deployment_diagram.mmd", "Shows how the system is deployed"),

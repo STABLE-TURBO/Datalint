@@ -157,6 +157,59 @@ datalint/
 
 ### Architecture Diagrams
 
+#### Class Diagram
+*Shows the class hierarchy and relationships*
+
+```mermaid
+classDiagram
+    class BaseValidator {
+        <<abstract>>
+        +String name*
+        +ValidationResult validate(DataFrame df)*
+        +String __repr__()
+    }
+
+    class Formatter {
+        <<abstract>>
+        +String format(List~ValidationResult~ results)*
+    }
+
+    class ValidationResult {
+        +String name
+        +String status
+        +String message
+        +List issues
+        +List recommendations
+        +Dict details
+        +Boolean passed
+        +Dict to_dict()
+    }
+
+    class ValidationRunner {
+        -List~BaseValidator~ validators
+        +ValidationRunner(List~BaseValidator~ validators)
+        +void add_validator(BaseValidator validator)
+        +List~ValidationResult~ run(DataFrame df)
+        +Dict~String,ValidationResult~ run_dict(DataFrame df)
+    }
+
+    class ConcreteValidator {
+        +String name
+        +ValidationResult validate(DataFrame df)
+    }
+
+    class ConcreteFormatter {
+        +String format(List~ValidationResult~ results)
+    }
+
+    BaseValidator <|.. ConcreteValidator : implements
+    Formatter <|.. ConcreteFormatter : implements
+    ValidationRunner --> BaseValidator : uses
+    BaseValidator --> ValidationResult : returns
+    ConcreteValidator --> ValidationResult : returns
+
+```
+
 #### Interface Diagram
 *Shows key interfaces and abstraction contracts*
 
