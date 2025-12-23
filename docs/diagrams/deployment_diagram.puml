@@ -1,0 +1,16 @@
+@startuml Deployment Diagram
+skinparam componentStyle uml2
+
+node "Local Machine" as local {
+  [Python Environment] as python
+  [DataLint Package] as datalint
+}
+
+node "Data Files" as data
+node "Output Reports" as reports
+
+datalint --> data : reads
+datalint --> reports : writes
+python --> datalint : executes
+
+@enduml

@@ -1,0 +1,22 @@
+@startuml Use Case Diagram
+left to right direction
+
+actor :Data Scientist: as DS
+actor :ML Engineer: as MLE
+actor :DevOps Engineer: as DevOps
+
+usecase "Validate Dataset" as UC1
+usecase "Learn from Clean Data" as UC2
+usecase "Profile Data Quality" as UC3
+usecase "Generate Reports" as UC4
+usecase "CI/CD Integration" as UC5
+
+DS --> UC1
+DS --> UC2
+MLE --> UC3
+DevOps --> UC5
+UC1 --> UC4
+UC2 --> UC4
+UC3 --> UC4
+
+@enduml

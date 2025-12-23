@@ -1,0 +1,10 @@
+repos:
+  - repo: local
+    hooks:
+      - id: generate-diagrams
+        name: Generate UML Diagrams
+        entry: python.exe
+        args: [scripts/generate_diagrams.py]
+        language: python
+        files: ^datalint/.*\.py$
+        pass_filenames: false

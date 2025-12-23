@@ -155,36 +155,133 @@ datalint/
     └── reporting.py    # Output formatter (text, JSON, HTML)
 ```
 
-### Class Diagram
+### Architecture Diagrams
 
-<!-- DIAGRAM-START -->
-```mermaid
-classDiagram
-  class BaseValidator {
-    name : str
-    validate(df: pd.DataFrame)* ValidationResult
-  }
-  class Formatter {
-    format(results: list[ValidationResult])* str
-  }
-  class ValidationResult {
-    details : dict
-    issues : list
-    message : str
-    name : str
-    passed : bool
-    recommendations : list
-    status : Literal['passed', 'warning', 'failed']
-    to_dict() dict
-  }
-  class ValidationRunner {
-    validators : list
-    add_validator(validator: BaseValidator) None
-    run(df: pd.DataFrame) list[ValidationResult]
-    run_dict(df: pd.DataFrame) dict[str, ValidationResult]
-  }
+#### Component Diagram
+*Illustrates high-level software components*
+
+```plantuml
+@startuml Component Diagram
+skinparam componentStyle uml2
+
+[cli] as cli <<Command Line Interface>>
+[engine] as engine <<Core Validation Engine>>
+[utils] as utils <<Utility Functions>>
+
+cli --> engine
+cli --> utils
+engine --> utils
+engine --> utils
+engine --> utils
+engine --> utils
+
+@enduml
 ```
-<!-- DIAGRAM-END -->
+
+#### Deployment Diagram
+*Shows how the system is deployed*
+
+```plantuml
+@startuml Deployment Diagram
+skinparam componentStyle uml2
+
+node "Local Machine" as local {
+  [Python Environment] as python
+  [DataLint Package] as datalint
+}
+
+node "Data Files" as data
+node "Output Reports" as reports
+
+datalint --> data : reads
+datalint --> reports : writes
+python --> datalint : executes
+
+@enduml
+```
+
+#### Sequence Diagram
+*Displays the validation workflow sequence*
+
+```plantuml
+@startuml Sequence Diagram
+autonumber
+
+actor User
+participant CLI
+participant ValidationRunner
+participant BaseValidator
+participant DataFrame
+
+User -> CLI: datalint validate file.csv
+CLI -> ValidationRunner: run(df)
+loop for each validator
+  ValidationRunner -> BaseValidator: validate(df)
+  BaseValidator -> DataFrame: analyze data
+  DataFrame --> BaseValidator: return analysis
+  BaseValidator --> ValidationRunner: ValidationResult
+end
+ValidationRunner --> CLI: results list
+CLI --> User: formatted output
+
+@enduml
+```
+
+#### Activity Diagram
+*Shows the validation pipeline activities*
+
+```plantuml
+@startuml Activity Diagram
+start
+:User runs datalint validate;
+:Parse command line arguments;
+:Load data file;
+if (File loaded successfully?) then (yes)
+  :Initialize ValidationRunner;
+  :Run all validators;
+  if (Validation passed?) then (yes)
+    :Generate success report;
+  else (no)
+    :Generate failure report;
+    :Show recommendations;
+  endif
+else (no)
+  :Show error message;
+endif
+:Exit;
+stop
+
+@enduml
+```
+
+#### Use Case Diagram
+*Illustrates user interactions with the system*
+
+```plantuml
+@startuml Use Case Diagram
+left to right direction
+
+actor :Data Scientist: as DS
+actor :ML Engineer: as MLE
+actor :DevOps Engineer: as DevOps
+
+usecase "Validate Dataset" as UC1
+usecase "Learn from Clean Data" as UC2
+usecase "Profile Data Quality" as UC3
+usecase "Generate Reports" as UC4
+usecase "CI/CD Integration" as UC5
+
+DS --> UC1
+DS --> UC2
+MLE --> UC3
+DevOps --> UC5
+UC1 --> UC4
+UC2 --> UC4
+UC3 --> UC4
+
+@enduml
+```
+
 
 ---
 

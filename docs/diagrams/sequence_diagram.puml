@@ -1,0 +1,21 @@
+@startuml Sequence Diagram
+autonumber
+
+actor User
+participant CLI
+participant ValidationRunner
+participant BaseValidator
+participant DataFrame
+
+User -> CLI: datalint validate file.csv
+CLI -> ValidationRunner: run(df)
+loop for each validator
+  ValidationRunner -> BaseValidator: validate(df)
+  BaseValidator -> DataFrame: analyze data
+  DataFrame --> BaseValidator: return analysis
+  BaseValidator --> ValidationRunner: ValidationResult
+end
+ValidationRunner --> CLI: results list
+CLI --> User: formatted output
+
+@enduml

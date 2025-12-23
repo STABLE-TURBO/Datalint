@@ -1,0 +1,15 @@
+@startuml Component Diagram
+skinparam componentStyle uml2
+
+[cli] as cli <<Command Line Interface>>
+[engine] as engine <<Core Validation Engine>>
+[utils] as utils <<Utility Functions>>
+
+cli --> engine
+cli --> utils
+engine --> utils
+engine --> utils
+engine --> utils
+engine --> utils
+
+@enduml

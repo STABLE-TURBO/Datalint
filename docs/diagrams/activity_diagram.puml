@@ -1,0 +1,21 @@
+@startuml Activity Diagram
+start
+:User runs datalint validate;
+:Parse command line arguments;
+:Load data file;
+if (File loaded successfully?) then (yes)
+  :Initialize ValidationRunner;
+  :Run all validators;
+  if (Validation passed?) then (yes)
+    :Generate success report;
+  else (no)
+    :Generate failure report;
+    :Show recommendations;
+  endif
+else (no)
+  :Show error message;
+endif
+:Exit;
+stop
+
+@enduml
