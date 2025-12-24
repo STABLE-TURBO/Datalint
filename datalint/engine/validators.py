@@ -59,3 +59,45 @@ def check_data_types(df: pd.DataFrame) -> dict:
             "Consider explicit type conversion or data cleaning"
         ] if issues else []
     }
+
+def check_outliers(df: pd.DataFrame, iqr_multiplier: float = 1.5) -> dict:
+    """
+    Detect outliers using Interquartile Range method.
+
+    Args:
+        df: Input DataFrame
+        iqr_multiplier: IQR multiplier for outlier bounds (default 1.5)
+
+    Reference: "Robust Statistics" by Peter J. Huber (1981)
+    IQR method widely used in exploratory data analysis.
+    """
+    numeric_cols = df.select_dtypes(include=[np.number]).columns
+    outlier_summary = {}
+
+    for col in numeric_cols:
+        Q1 = df[col].quantile(0.25)
+        Q3 = df[col].quantile(0.75)
+        IQR = Q3 - Q1
+
+        lower_bound = Q1 - iqr_multiplier * IQR
+        upper_bound = Q3 + iqr_multiplier * IQR
+
+        outliers = df[(df[col] < lower_bound) | (df[col] > upper_bound)]
+        outlier_ratio = len(outliers) / len(df)
+
+        if outlier_ratio > 0.05:  # More than 5% outliers
+            outlier_summary[col] = {
+                'count': len(outliers),
+                'ratio': outlier_ratio,
+                'bounds': (lower_bound, upper_bound)
+            }
+
+    return {
+        'passed': len(outlier_summary) == 0,
+        'issues': outlier_summary,
+        'recommendations': [
+            f"Column '{col}' has {info['ratio']:.1%} outliers. "
+            f"Consider winsorization or investigation."
+            for col, info in outlier_summary.items()
+        ]
+    }
