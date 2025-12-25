@@ -101,3 +101,39 @@ def check_outliers(df: pd.DataFrame, iqr_multiplier: float = 1.5) -> dict:
             for col, info in outlier_summary.items()
         ]
     }
+
+def check_correlations(df: pd.DataFrame, threshold: float = 0.95) -> dict:
+    """
+    Detect highly correlated features that may cause multicollinearity.
+
+    Args:
+        df: Numeric DataFrame
+        threshold: Correlation coefficient threshold (default 0.95)
+
+    Reference: "Applied Linear Statistical Models" by Kutner et al.
+    Correlation analysis crucial for ML model stability.
+    """
+    numeric_df = df.select_dtypes(include=[np.number])
+    corr_matrix = numeric_df.corr()
+
+    # Find highly correlated pairs
+    high_corr_pairs = []
+    for i in range(len(corr_matrix.columns)):
+        for j in range(i+1, len(corr_matrix.columns)):
+            corr_val = abs(corr_matrix.iloc[i, j])
+            if corr_val > threshold:
+                high_corr_pairs.append((
+                    corr_matrix.columns[i],
+                    corr_matrix.columns[j],
+                    corr_val
+                ))
+
+    return {
+        'passed': len(high_corr_pairs) == 0,
+        'issues': high_corr_pairs,
+        'recommendations': [
+            f"Features '{pair[0]}' and '{pair[1]}' correlated at {pair[2]:.3f}. "
+            f"Consider feature selection or dimensionality reduction."
+            for pair in high_corr_pairs
+        ]
+    }
